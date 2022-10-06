@@ -129,14 +129,12 @@ La conversación mantenida por `alu1` y `alu2` es la siguiente:
 `alu1` al ver que está de acuerdo con la PR de `alu2` la acepta realizando un merge del PR.
 
 <div align="center">
-    /*captura del merge*/
 <img src="img/CapturaGr12.png">
 </div>
 
 Para que los cambios puedas ser visibles en el repositorio de `alu1` este deberá traerse los cambios con un pull
 
 <div align="center">
-    /*captura del merge*/
 <img src="img/CapturaGr122.png">
 </div>
 
