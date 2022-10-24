@@ -1,0 +1,22 @@
+* {
+  font-family: "Oswald";
+  font-size: large;
+}
+
+h1{
+  font-size:xx-large;
+  text-align: center;
+}
+
+table{
+  margin: auto;
+  padding: 2%;
+}
+
+tr{
+  text-align: center;
+}
+
+td{
+  padding: 10px;
+}
