@@ -470,7 +470,7 @@ oct 20 19:47:47 marte17 systemd[1]: Starting The PHP 8.2 FastCGI Process Manage>
 oct 20 19:47:47 marte17 systemd[1]: Started The PHP 8.2 FastCGI Process Manager.
 ```
 
-Como hemos comprobado se ha instalado correctamente para comprobar que funciona haremos una prueba para cver si devuelve el mensaje:
+Como hemos comprobado se ha instalado correctamente para comprobar que funciona haremos una prueba para ver si devuelve el mensaje:
 
 ```console
 grace@marte17:~$ php -r "echo 'Hello World';"
@@ -498,7 +498,7 @@ Luego guardamos los cambios y recargamos el servicio de **PHP-FPM**
 grace@marte17:~$ sudo systemctl reload php8.2-fpm
 ```
 
-Y habilitamos la comunicación  entre Nginx y PHP-FPM accediendo a **/etc/nginx/conf.d/default.conf** y modificando el bloque de **location / ** y el de **location ~ \.php$**
+Y habilitamos la comunicación  entre Nginx y PHP-FPM accediendo a **/etc/nginx/conf.d/default.conf** y modificando el bloque de **location /** y el de **location ~ \.php$**
 
 ```console
 grace@marte17:~$ sudo vi /etc/nginx/conf.d/default.conf
