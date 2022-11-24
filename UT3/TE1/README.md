@@ -189,7 +189,7 @@ Compruebo que la carpeta se encuentra en el servidor
 
 # Crear una aplicación web que permita el tratamiento de dichas imágenes.<a name="5"></a>
 
-Puede acceder al código fuente de la aplicación pinchando este [enlace]('./src/index.html'). La aplicación tiene el siguiente aspecto:
+Puede acceder al código fuente de la aplicación pinchando este [enlace](./src/index.html). La aplicación tiene el siguiente aspecto:
 
 <div align="center">
   <img src="./Screenshots/Captura5.1.png">
