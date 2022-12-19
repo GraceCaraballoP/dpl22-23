@@ -1,0 +1,9 @@
+<?php
+    if(!defined('_CONFIG_')){
+        define('_CONFIG_',true);
+        define('HOST','localhost');
+        define('DB_NAME','travelroad');
+        define('DB_USER','travelroad_user');
+        define('DB_PASS','travelgrace1');
+    }
+?>
