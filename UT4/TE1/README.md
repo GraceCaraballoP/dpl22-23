@@ -484,7 +484,7 @@ El resultado de `php.travelroad.alu7273.arkania.es` es:
 </div>
 
 
-#### Incluya certificado de seguridad y redirección www.<a name="3.4"></a>
+#### Incluya certificado de seguridad y redirección `www`.<a name="3.4"></a>
 
 Lanzo certbot para crear el certificado de seguridad para [php.travelroad.alu7273.arkania.es](https://php.travelroad.alu7273.arkania.es):
 
