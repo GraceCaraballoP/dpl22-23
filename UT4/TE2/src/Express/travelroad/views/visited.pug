@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Places I've Already Been To
+
+    ul
+    each place in visited
+        li= place.name
+    br
+    a(href='/') <- Back home

@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Places I'd Like to Visit
+
+    ul
+    each place in wished
+        li= place.name
+    br
+    a(href='/') <- Back home
