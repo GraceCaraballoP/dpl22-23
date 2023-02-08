@@ -643,7 +643,7 @@ Description=Spring Boot TravelRoad
 [Service]
 Type=simple
 StandardOutput=journal
-ExecStart=/home/grace/DPL/dpl22-23/UT4/TE2/src/Spring/travelroad/run.sh
+ExecStart=/home/grace/Spring/travelroad/run.sh
 
 [Install]
 WantedBy=default.target
@@ -762,3 +762,116 @@ chmod +x deploy.sh
 </div>
 
 ## Despliegue<a name="7"></a>
+
+Ignoramos el fichero `application.properties` y subimos los archivos al repositorio de `dpl22-23/UT4/TE2`
+
+Nos trasladamos al servidor virtual y hacemos las instalaciones necesarias nombradas en el primer apartado como lo hicimos en local y nos traemos los cambios del repositorio con un `git pull` en `dpl22-23/UT4`
+
+creamos el fichero `application.properties` en la misma ruta que en local, es decir en `travelroad/src/main/resources` con los datos referentes a la base de datos:
+
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/travelroad
+spring.datasource.username=travelroad_user
+spring.datasource.password=*********
+```
+>**Nota**: Debemos cambiar ***** por nuestra contraseña para dicho usuario.
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura52.png">
+</div>
+
+Nos dirigimos a `/etc/nginx/conf.d` y creamos el archivo de configuracion `spring.travelroad.conf`
+
+```
+server {
+    server_name spring.travelroad.alu7273.arkania.es;
+
+    location / {
+        proxy_pass http://localhost:8080;  # socket TCP
+    }
+}
+```
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura53.png">
+</div>
+
+Recargamos el servicio de nginx:
+
+```
+sudo systemctl reload nginx
+```
+
+Nos posicionamos en `/DPL/dpl22-23/UT4/TE2/src/Spring` y creamos `run.sh` con sl siguiente contenido para posteriormente crear un servicio que lo llame:
+
+```
+#!/bin/bash
+
+cd /home/grace/DPL/dpl22-23/UT4/TE2/src/Spring/travelroad
+
+./mvnw package  # el empaquetado ya incluye la compilación
+
+# ↓ Último fichero JAR generado
+JAR=`ls target/*.jar -t | head -1`
+/usr/bin/java -jar $JAR
+```
+
+>**Nota:** La ruta a la que nos desplazamos debe ser hacia el raíz del proyecto.
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura54.png">
+</div>
+
+Cambiamos los permisos de `run.sh` para asignarle los de ejecución:
+
+```
+chmod +x run.sh
+```
+
+Creamos el servicio que apunte a `run.sh` como lo hicimos anteriormente en local.
+
+Una vez creado y levantado el servicio, comprobamos que funciona correctamente accediendo a `http://spring.travelroad.alu7273.arkania.es`
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura55.png">
+</div>
+
+Comprobamos que funciona correctamente en `http://spring.travelroad.alu7273.arkania.es/visited`
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura56.png">
+</div>
+
+Comprobamos que funciona correctamente en `http://spring.travelroad.alu7273.arkania.es/wished`
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura57.png">
+</div>
+
+## Certificado de Seguridad<a name="8"></a>
+
+Finalmente lanzo certbot para crear el certificado de seguridad para `spring.travelroad.alu7273.arkania.es`:
+
+```
+sudo certbot --nginx -d spring.travelroad.alu7273.arkania.es
+```
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura58.png">
+</div>
+
+Comprobamos que funcionan correctamente con el certificado de seguridad para [https://spring.travelroad.alu7273.arkania.es](https://spring.travelroad.alu7273.arkania.es)
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura59.png">
+</div>
+
+Comprobamos que funcionan correctamente con el certificado de seguridad para [https://spring.travelroad.alu7273.arkania.es/visited](https://spring.travelroad.alu7273.arkania.es/visited)
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura60.png">
+</div>
+
+Y finalmente para [https://spring.travelroad.alu7273.arkania.es/wished](https://spring.travelroad.alu7273.arkania.es/wished)
+
+<div align="center">
+  <img src="../../Screenshots/Spring/Captura61.png">
+</div>
