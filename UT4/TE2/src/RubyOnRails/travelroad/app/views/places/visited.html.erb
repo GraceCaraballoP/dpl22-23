@@ -1,0 +1,8 @@
+<h1>Places I've Already Been To</h1>
+<ul>
+  <% @visited.each do |place| %>
+    <li><%= place.name %></li>
+  <% end %>
+</ul>
+
+<a href="/"><- Back Home</a>
