@@ -599,36 +599,3 @@ Comprobamos que funciona correctamente en `http://django.travelroad.alu7273.arka
 <div align="center">
   <img src="../../Screenshots/Django/Captura57.png">
 </div>
-
-## Certificado de Seguridad<a name="8"></a>
-
-Finalmente lanzo certbot para crear el certificado de seguridad para `django.travelroad.alu7273.arkania.es`:
-
-```
-sudo certbot --nginx -d django.travelroad.alu7273.arkania.es
-```
-<div align="center">
-  <img src="../../Screenshots/Django/Captura58.png">
-</div>
-
-Comprobamos que funcionan correctamente con el certificado de seguridad para [https://django.travelroad.alu7273.arkania.es](https://django.travelroad.alu7273.arkania.es)
-
-<div align="center">
-  <img src="../../Screenshots/Django/Captura59.png">
-</div>
-
-Comprobamos que funcionan correctamente con el certificado de seguridad para [https://django.travelroad.alu7273.arkania.es/visited](https://django.travelroad.alu7273.arkania.es/visited)
-
-<div align="center">
-  <img src="../../Screenshots/Django/Captura60.png">
-</div>
-
-Y finalmente para [https://django.travelroad.alu7273.arkania.es/wished](https://django.travelroad.alu7273.arkania.es/wished)
-
-<div align="center">
-  <img src="../../Screenshots/Django/Captura61.png">
-</div>
-
-
-ruby --version
-gem --version
