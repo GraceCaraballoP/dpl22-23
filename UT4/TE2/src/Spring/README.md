@@ -1,4 +1,4 @@
-## Spring<a name="2"></a>
+## SPRING
 
 <div align="center">
   <img src="../../Imagenes/logo_spring.png" width="500px">
