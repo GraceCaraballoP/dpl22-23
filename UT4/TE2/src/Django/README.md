@@ -1,4 +1,4 @@
-## DJANGO<a name="2"></a>
+## DJANGO
 
 <div align="center">
   <img src="../../Imagenes/logo_django.png" width="500px">
@@ -460,6 +460,7 @@ vi main/settings.py
 
 Con lo siguiente:
 
+```
 ...
 from pathlib import Path
 # ↓ Nueva línea
@@ -480,7 +481,7 @@ DATABASES = {
     }
 }
 ...
-
+```
 >**Nota:** Como siempre con ****** nos referimos a la contrasela de nuestro usuario de la base de datos.
 
 <div align="center">
@@ -523,3 +524,111 @@ prettyconf
 
 ## Entorno de producción<a name="8"></a>
 
+<div align="center">
+  <img src="../../Screenshots/Django/Captura31.png">
+</div>
+
+
+Añadimos el nuevo servidor `spring.travelroad` a los hosts locales en `/etc/hosts`:
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura46.png">
+</div>
+
+
+Comprobamos que ya podemos acceder a `http://spring.travelroad` y funciona correctamente:
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura47.png">
+</div>
+
+**http://spring.travelroad/visited**
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura48.png">
+</div>
+
+**http://spring.travelroad/wished**
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura49.png">
+</div>
+
+
+## Script de despliegue<a name="6"></a>
+
+Creamos el script de despliegue [deploy.sh](./deploy.sh)
+
+```
+#!/bin/bash
+
+ssh arkania "cd /home/grace/DPL/dpl22-23/UT4/TE2/src/Spring/travelroad; git pull; systemctl --user restart travelroad.service"
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura50.png">
+</div>
+
+Le damos permisos de ejecución a dicho script.
+
+```
+chmod +x deploy.sh
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura51.png">
+</div>
+
+## Despliegue<a name="7"></a>
+
+
+Una vez creado y levantado el servicio, comprobamos que funciona correctamente accediendo a `http://django.travelroad.alu7273.arkania.es`
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura55.png">
+</div>
+
+Comprobamos que funciona correctamente en `http://django.travelroad.alu7273.arkania.es/visited`
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura56.png">
+</div>
+
+Comprobamos que funciona correctamente en `http://django.travelroad.alu7273.arkania.es/wished`
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura57.png">
+</div>
+
+## Certificado de Seguridad<a name="8"></a>
+
+Finalmente lanzo certbot para crear el certificado de seguridad para `django.travelroad.alu7273.arkania.es`:
+
+```
+sudo certbot --nginx -d django.travelroad.alu7273.arkania.es
+```
+<div align="center">
+  <img src="../../Screenshots/Django/Captura58.png">
+</div>
+
+Comprobamos que funcionan correctamente con el certificado de seguridad para [https://django.travelroad.alu7273.arkania.es](https://django.travelroad.alu7273.arkania.es)
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura59.png">
+</div>
+
+Comprobamos que funcionan correctamente con el certificado de seguridad para [https://django.travelroad.alu7273.arkania.es/visited](https://django.travelroad.alu7273.arkania.es/visited)
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura60.png">
+</div>
+
+Y finalmente para [https://django.travelroad.alu7273.arkania.es/wished](https://django.travelroad.alu7273.arkania.es/wished)
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura61.png">
+</div>
+
+
+ruby --version
+gem --version
