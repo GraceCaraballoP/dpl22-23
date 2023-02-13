@@ -1,4 +1,4 @@
-## EXPRESS<a name="2"></a>
+## EXPRESS
 
 <div align="center">
   <img src="../../Imagenes/logo_express.png" width="500px">
