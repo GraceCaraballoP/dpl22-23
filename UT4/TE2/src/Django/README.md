@@ -11,8 +11,9 @@
 4. [URLs](#4)
 5. [Probando la aplicación en local](#5)
 6. [Parametrizando la configuración](#6)
-7. [Especificación de requerimientos](#7)
-8. [Entorno de producción](#8)
+7. [Entorno de producción](#7)
+8. [Script de despliegue](#8)
+9. [Certificado de Seguridad](#9)
 
 
 ## Instalación<a name="1"></a>
@@ -506,7 +507,7 @@ Comprobamos que todo está correcto con:
   <img src="../../Screenshots/Django/Captura29.png">
 </div>
 
-## Especificación de requerimientos<a name="7"></a>
+### Especificación de requerimientos
 
 Debemos especificar en un fichero los requerimientos o dependencias para poder clonarlo en cualquier entorno virtual. Para ello creamos el fichero `requirements.txt` en el cual especificamos los paquetes que hemos ultilizado:
 
@@ -522,51 +523,315 @@ prettyconf
 
 
 
-## Entorno de producción<a name="8"></a>
+## Entorno de producción<a name="7"></a>
+
+Una vez subidos los archivos al control de versiones, desde arkania hacemos un `git pull` para traernos los cambios. Nos posicionamos en `Django/travelroad` y creamos el entorno virtual como anteriormente:
+
+```
+python -m venv --prompt travelroad .venv
+```
 
 <div align="center">
   <img src="../../Screenshots/Django/Captura31.png">
 </div>
 
+Accedemos al entorno virtual:
 
-Añadimos el nuevo servidor `spring.travelroad` a los hosts locales en `/etc/hosts`:
+```
+source .venv/bin/activate
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura32.png">
+</div>
+
+Instalamos los `requirements` detallados anteriormente
+
+```
+pip install -r requirements.txt
+```
+<div align="center">
+  <img src="../../Screenshots/Django/Captura33.png">
+</div>
+
+### Parámetros para el entorno de producción
+
+Creamos el fichero .env que contendrá las configuraciones para el entorno de producción:
+
+```
+vi .env
+```
+
+Con el siguiente contenido:
+
+```
+DEBUG=0
+# ↓ Dominio en el que se va a desplegar la aplicación
+ALLOWED_HOSTS=django.travelroad.alu7273.arkania.es
+#DB_PASSWORD='*******'
+```
+<div align="center">
+  <img src="../../Screenshots/Django/Captura34.png">
+</div>
+
+
+### Servidor de aplicación
+
+Para el despliegue de la aplicación usaremos `gunicorn` como servidor WSGI (Web Server Gateway Interface) para Python.Para instalarlo haremos:
+
+```
+pip install gunicorn
+```
+<div align="center">
+  <img src="../../Screenshots/Django/Captura35.png">
+</div>
+
+Lanzamos el script de gestión que permite lanzar el servidor:
+
+```
+gunicorn main.wsgi:application
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura36.png">
+</div>
+
+### Supervisor
+
+Para poder mantener el servidor WSGI activo y con la posibilidad de gestionarlo (arrancar, parar, etc.) vamos a usar Supervisor que es un sistema cliente/servidor que permite monitorizar y controlar procesos en sistemas Linux/UNIX. Para instalarlo ejecutamos:
+
+```
+sudo apt install -y supervisor
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura37.png">
+</div>
+
+Comprobamos que el servicio está funcionando:
+
+```
+sudo systemctl status supervisor
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura38.png">
+</div>
+
+
+Supervisor viene con la herramienta supervisorctl, pero como usuarios ordinarios no tenemos permiso para poder hacer uso de ella como vemos a continuación:
+
+```
+supervisorctl status
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura39.png">
+</div>
+
+Para poder hacer uso de la herramienta anterior comenzaremos por añadir un grupo supervisor con permisos para ello:
+
+```
+sudo groupadd supervisor
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura40.png">
+</div>
+
+Editamos la configuración de Supervisor para añadir a nuestro usuario:
+
+```
+sudo vi /etc/supervisor/supervisord.conf
+```
+
+Cambiamos el chmod y seguidamente añadimos el chown:
+
+```
+...
+chmod=0770               ; socket file mode (default 0700)
+chown=grace:supervisor    ; grupo 'supervisor' para usuarios no privilegiados
+...
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura41.png">
+</div>
+
+Reiniciamos el servicio de supervisor para que los cambios se hagan efectivos:
+
+```
+sudo systemctl restart supervisor
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura42.png">
+</div>
+
+Añadimos nuestro usuario al grupo:
+
+```
+sudo addgroup grace supervisor
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura43.png">
+</div>
+
+>**Nota:** Para que el cambio de grupo sea efectivo debemos cerrar la sesión y luego volver a entrar.
+
+
+Comprobamos que ya no se producen errores al lanzar el controlador de supervisor:
+
+```
+supervisorctl help
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura44.png">
+</div>
+
+
+### Script de servicio
+
+Creamos un script de servicio para nuestra aplicación que se encargue de levantar gunicorn:
+
+```
+vi run.sh
+```
+
+```
+#!/bin/bash
+
+cd /home/grace/DPL/Repo/dpl22-23/UT4/TE2/src/Django/travelroad
+source .venv/bin/activate
+gunicorn -b unix:/tmp/travelroad.sock main.wsgi:application
+
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura45.png">
+</div>
+
+Le damos permisos de ejecución:
+
+```
+chmod +x run.sh
+```
 
 <div align="center">
   <img src="../../Screenshots/Django/Captura46.png">
 </div>
 
 
-Comprobamos que ya podemos acceder a `http://spring.travelroad` y funciona correctamente:
+### Configuración Supervisor
+
+Creamos la configuración de un proceso supervisor que lance nuestro script:
+
+```
+sudo vi /etc/supervisor/conf.d/travelroad.conf
+```
+
+Con lo siguiente:
+
+```
+[program:travelroad]
+user = grace
+command = /home/grace/DPL/Repo/dpl22-23/UT4/TE2/src/Django/travelroad/run.sh
+autostart = true
+autorestart = true
+stopsignal = INT
+killasgroup = true
+stderr_logfile = /var/log/supervisor/travelroad.err.log
+stdout_logfile = /var/log/supervisor/travelroad.out.log
+```
 
 <div align="center">
   <img src="../../Screenshots/Django/Captura47.png">
 </div>
 
-**http://spring.travelroad/visited**
+Ahora ya podemos añadir este proceso:
+
+```
+supervisorctl reread
+supervisorctl add travelroad
+supervisorctl status
+```
 
 <div align="center">
   <img src="../../Screenshots/Django/Captura48.png">
 </div>
 
-**http://spring.travelroad/wished**
 
+### Nginx
+
+Finalmente configuramos el virtual host `django.travelroad.alu7273.arkania.es`:
+
+```
+sudo vi /etc/nginx/conf.d/travelroad.conf
+```
+
+Con lo siguiente:
+
+```
+server {
+  server_name django.travelroad.alu7273.arkania.es;
+
+  location / {
+    include proxy_params;
+    proxy_pass http://unix:/tmp/travelroad.sock;  # socket UNIX
+  }
+}
+```
+ 
 <div align="center">
   <img src="../../Screenshots/Django/Captura49.png">
 </div>
 
 
-## Script de despliegue<a name="6"></a>
+Recargamos la configuración de Nginx para que los cambios surtan efecto:
+
+```
+sudo systemctl reload nginx
+```
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura50.png">
+</div>
+
+### Aplicación en producción
+
+Comprobamos que ya podemos acceder http://django.travelroad.alu7273.arkania.es
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura51.png">
+</div>
+
+http://django.travelroad.alu7273.arkania.es/visited
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura52.png">
+</div>
+
+Comprobamos que funciona correctamente en http://django.travelroad.alu7273.arkania.es/wished
+
+<div align="center">
+  <img src="../../Screenshots/Django/Captura53.png">
+</div>
+
+
+## Script de despliegue<a name="8"></a>
 
 Creamos el script de despliegue [deploy.sh](./deploy.sh)
 
 ```
 #!/bin/bash
 
-ssh arkania "cd /home/grace/DPL/dpl22-23/UT4/TE2/src/Spring/travelroad; git pull; systemctl --user restart travelroad.service"
+ssh arkania "cd /home/grace/DPL/dpl22-23/UT4/TE2/src/Django/travelroad; git pull; source .venv/bin/activate; pip install -r requirements.txt; supervisorctl restart travelroad"
 ```
 
 <div align="center">
-  <img src="../../Screenshots/Django/Captura50.png">
+  <img src="../../Screenshots/Django/Captura54.png">
 </div>
 
 Le damos permisos de ejecución a dicho script.
@@ -576,31 +841,10 @@ chmod +x deploy.sh
 ```
 
 <div align="center">
-  <img src="../../Screenshots/Django/Captura51.png">
-</div>
-
-## Despliegue<a name="7"></a>
-
-
-Una vez creado y levantado el servicio, comprobamos que funciona correctamente accediendo a `http://django.travelroad.alu7273.arkania.es`
-
-<div align="center">
   <img src="../../Screenshots/Django/Captura55.png">
 </div>
 
-Comprobamos que funciona correctamente en `http://django.travelroad.alu7273.arkania.es/visited`
-
-<div align="center">
-  <img src="../../Screenshots/Django/Captura56.png">
-</div>
-
-Comprobamos que funciona correctamente en `http://django.travelroad.alu7273.arkania.es/wished`
-
-<div align="center">
-  <img src="../../Screenshots/Django/Captura57.png">
-</div>
-
-## Certificado de Seguridad<a name="8"></a>
+## Certificado de Seguridad<a name="9"></a>
 
 Finalmente lanzo certbot para crear el certificado de seguridad para `django.travelroad.alu7273.arkania.es`:
 
@@ -608,27 +852,23 @@ Finalmente lanzo certbot para crear el certificado de seguridad para `django.tra
 sudo certbot --nginx -d django.travelroad.alu7273.arkania.es
 ```
 <div align="center">
-  <img src="../../Screenshots/Django/Captura58.png">
+  <img src="../../Screenshots/Django/Captura56.png">
 </div>
 
 Comprobamos que funcionan correctamente con el certificado de seguridad para [https://django.travelroad.alu7273.arkania.es](https://django.travelroad.alu7273.arkania.es)
 
 <div align="center">
-  <img src="../../Screenshots/Django/Captura59.png">
+  <img src="../../Screenshots/Django/Captura57.png">
 </div>
 
 Comprobamos que funcionan correctamente con el certificado de seguridad para [https://django.travelroad.alu7273.arkania.es/visited](https://django.travelroad.alu7273.arkania.es/visited)
 
 <div align="center">
-  <img src="../../Screenshots/Django/Captura60.png">
+  <img src="../../Screenshots/Django/Captura58.png">
 </div>
 
 Y finalmente para [https://django.travelroad.alu7273.arkania.es/wished](https://django.travelroad.alu7273.arkania.es/wished)
 
 <div align="center">
-  <img src="../../Screenshots/Django/Captura61.png">
+  <img src="../../Screenshots/Django/Captura59.png">
 </div>
-
-
-ruby --version
-gem --version
